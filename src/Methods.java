@@ -4,28 +4,21 @@ public class Methods {
     private ArrayList<Integer> listTime ;
     private ArrayList<Integer> listCountException;
     private ArrayList<Double> listK;
+    private ArrayList<Double> listDifN = new ArrayList<>();
+    private double K;
+    private double N0;
     private static final double EPS = 0.0001;
 
-    public Methods(ArrayList<Integer> listTime,ArrayList<Integer> listCountException, ArrayList<Double> K) {
+    public Methods(ArrayList<Integer> listTime,ArrayList<Integer> listCountException, ArrayList<Double> listK) {
         this.listTime = listTime;
         this.listCountException = listCountException;
-        this.listK = K;
+        this.listK = listK;
+        setK();
+        setN0();
+        setListDifN();
     }
 
-    public double getN0(double K){
-        double N0=0;
-        double value_ch=0;
-        double value_zn=0;
-        double valueK = K;
-        for (int i = 0; i < listTime.size(); i++) {
-            value_ch += listCountException.get(i)*listTime.get(i)*Math.exp(-1*valueK*listTime.get(i));
-            value_zn +=listTime.get(i)*Math.exp(-2*valueK*listTime.get(i));
-        }
-        N0 = value_ch/(valueK*value_zn);
-        return N0;
-    }
-
-    public double getK(){
+    private void setK(){
         double kLeft =0;
         double kRight =0;
         for (double k: listK) {
@@ -42,32 +35,74 @@ public class Methods {
             kRight = value1R;
             decLR = Math.abs(kLeft - kRight);
             if (EPS > decLR) {
-                return k;
+                K = k;
             }
         }
-        return 0;
     }
 
-    public ArrayList<Double> getDifN(double k, double N0){
-        ArrayList<Double> listDifN = new ArrayList<>();
+    public double getK() {
+        return this.K;
+    }
+
+    public void setN0(){
+        double value_ch=0;
+        double value_zn=0;
         for (int i = 0; i < listTime.size(); i++) {
-            double exp = Math.exp(-1*k*listTime.get(i));
-            listDifN.add(N0*k*exp);
+            value_ch += listCountException.get(i)*listTime.get(i)*Math.exp(-1*this.K*listTime.get(i));
+            value_zn +=listTime.get(i)*Math.exp(-2*this.K*listTime.get(i));
         }
+        this.N0 = value_ch/(this.K*value_zn);
+    }
+
+    public double getN0() {
+        return N0;
+    }
+
+    public void setListDifN(){
+        for (int i = 0; i < listTime.size(); i++) {
+            double exp = Math.exp(-1*this.K*listTime.get(i));
+            listDifN.add(this.N0*this.K*exp);
+        }
+    }
+
+    public ArrayList<Double> getListDifN() {
         return listDifN;
     }
-    //TODO доделать линейную апроксимацию
-//    public double getLinearAproximation(){
-//        for (int i = 0; i < listTime.size(); i++) {
-//
-//        }
-//    }
 
-    public ArrayList<Double> getPNO(ArrayList<Double> difN,double K){
-        ArrayList<Double> Pn0 = new ArrayList<>();
-        for (double v:difN) {
-            Pn0.add(1-(v/K));
+    public double[] getLinearAproximation(){
+        int [] valuesX = new int[listDifN.size()];
+        for (int i = 0; i <valuesX.length; i++) {
+            valuesX[i] =i;
         }
-        return Pn0;
+        double sumX=0;
+        double sumX2=0;
+        double sumY=0;
+        double sumXY=0;
+        int n = valuesX.length;
+        for (int i = 0; i < n; i++) {
+            sumX += valuesX[i];
+            sumX2 += Math.pow(valuesX[i],2);
+            sumY += listDifN.get(i);
+            sumXY += valuesX[i] * listDifN.get(i);
+        }
+        double a = (n * sumXY - (sumX*sumY))/(n * sumX2 - sumX*sumX);
+        double b = (sumY - a * sumX)/ n;
+
+        double[] valueFunction = new double[valuesX.length];
+        for (int i = 0; i < n; i++) {
+            valueFunction[i] = a * valuesX[i] + b;
+        }
+
+        return valueFunction;
+    }
+
+    public ArrayList<Double> getListPN0(double[] listDeltNi){
+        ArrayList<Double> listPN0 = new ArrayList<>();
+        double bufPN0=0;
+        for (Double dNi: listDeltNi) {
+            bufPN0 =((this.K-2*dNi)/(this.K-dNi));
+            listPN0.add(bufPN0);
+        }
+        return listPN0;
     }
 }

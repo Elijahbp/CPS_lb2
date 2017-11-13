@@ -27,7 +27,7 @@ public class Main {
         }
         Methods methods = new Methods(listTime,listCountException,listK);
         double K = methods.getK();
-        double N0 = methods.getN0(K);
+        double N0 = methods.getN0();
 
         System.out.println("-----N0 = "+N0+"-----K = "+K+"-------");
         for (int j = 0; j < listK.size(); j++) {
@@ -38,9 +38,9 @@ public class Main {
 
         System.out.println("Полученные точки:");
         double divN0=N0;
-        ArrayList<Double> bufArrays = methods.getDifN(K,N0);
+        ArrayList<Double> bufArrays = methods.getListDifN();
         for (int j = 0; j < bufArrays.size(); j++) {
-            System.out.println("n"+j+"= "+bufArrays.get(j));
+            System.out.println("x="+j+" deltNi="+bufArrays.get(j));
             divN0-=bufArrays.get(j);
         }
         System.out.println("Невязки в точках:");
@@ -52,11 +52,35 @@ public class Main {
             sumSquareDif += Math.pow(value,2);
         }
         System.out.println("Сумма квадратов невязок ="+sumSquareDif);
-        System.out.println("Кол-во оставшихся ошибок: "+divN0);
+        System.out.println("Кол-во оставшихся ошибок: "+divN0+"\n");
 
-        ArrayList<Double> doubles = methods.getPNO(bufArrays,K);
-        for (int j = 0; j < doubles.size(); j++) {
-            System.out.println("P"+j+"= "+ doubles.get(j));
+        System.out.println("Апроксимация линейной функции: ");
+        double[] bufAproxArray = methods.getLinearAproximation();
+        for (int x = 0; x < bufAproxArray.length; x++) {
+            System.out.println("x="+x+" deltNi="+bufAproxArray[x]);
+        }
+
+        System.out.println("Невязки в точках:");
+        sumSquareDif=0;
+        for (int j = 0; j < bufAproxArray.length; j++) {
+            double value = (Math.abs(listCountException.get(j)-bufAproxArray[j]));
+            System.out.println("Невязка №"+j+"= "+value);
+            System.out.println("Квадрат Невязки №"+j+"= "+Math.pow(value,2));
+            sumSquareDif += Math.pow(value,2);
+        }
+        System.out.println("Сумма квадратов невязок ="+sumSquareDif+"\n");
+
+        double[] bufArrayDeltNi = {
+            0.0001,0.0002,0.0003,0.0004,0.0005,
+                0.001,0.002,0.003,0.004,0.005,
+                0.01,0.02,0.03,0.04,0.05,
+                0.1,0.2,0.3,0.4,0.5
+        };
+
+
+        ArrayList<Double> arrayListPN0 = methods.getListPN0( bufArrayDeltNi);
+        for (int j = 0; j < arrayListPN0.size(); j++) {
+            System.out.println("P"+j+"= "+ arrayListPN0.get(j));
         }
         System.out.println();
 
