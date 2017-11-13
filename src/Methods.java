@@ -5,9 +5,23 @@ public class Methods {
     private ArrayList<Integer> listCountException;
     private ArrayList<Double> listK;
     private ArrayList<Double> listDifN = new ArrayList<>();
+    private ArrayList<Double> listAproximation;
     private double K;
     private double N0;
     private static final double EPS = 0.0001;
+    private double A;
+    private double B;
+
+    public double getA() {
+        return A;
+    }
+
+    public double getB() {
+        return B;
+    }
+
+
+
 
     public Methods(ArrayList<Integer> listTime,ArrayList<Integer> listCountException, ArrayList<Double> listK) {
         this.listTime = listTime;
@@ -16,6 +30,7 @@ public class Methods {
         setK();
         setN0();
         setListDifN();
+        setLinearAproximation();
     }
 
     private void setK(){
@@ -69,7 +84,7 @@ public class Methods {
         return listDifN;
     }
 
-    public double[] getLinearAproximation(){
+    public void setLinearAproximation(){
         int [] valuesX = new int[listDifN.size()];
         for (int i = 0; i <valuesX.length; i++) {
             valuesX[i] =i;
@@ -85,15 +100,17 @@ public class Methods {
             sumY += listDifN.get(i);
             sumXY += valuesX[i] * listDifN.get(i);
         }
-        double a = (n * sumXY - (sumX*sumY))/(n * sumX2 - sumX*sumX);
-        double b = (sumY - a * sumX)/ n;
+        this.A = (n * sumXY - (sumX*sumY))/(n * sumX2 - sumX*sumX);
+        this.B = (sumY - this.A * sumX)/ n;
 
-        double[] valueFunction = new double[valuesX.length];
+        listAproximation = new  ArrayList<>();
         for (int i = 0; i < n; i++) {
-            valueFunction[i] = a * valuesX[i] + b;
+            listAproximation.add(this.A * valuesX[i] + this.B);
         }
+    }
 
-        return valueFunction;
+    public ArrayList<Double> getListAproximation() {
+        return listAproximation;
     }
 
     public ArrayList<Double> getListPN0(double[] listDeltNi){

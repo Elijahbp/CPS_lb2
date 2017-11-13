@@ -10,7 +10,7 @@ public class Main {
         };
 
         Integer [] arrayCountException= new Integer[]{
-                3,4,2,1,1,1,0
+                5,4,2,2,1,1,0
         };
 
         ArrayList<Integer> listTime = new ArrayList<>();
@@ -55,15 +55,17 @@ public class Main {
         System.out.println("Кол-во оставшихся ошибок: "+divN0+"\n");
 
         System.out.println("Апроксимация линейной функции: ");
-        double[] bufAproxArray = methods.getLinearAproximation();
-        for (int x = 0; x < bufAproxArray.length; x++) {
-            System.out.println("x="+x+" deltNi="+bufAproxArray[x]);
-        }
-
+        ArrayList<Double> bufAproxArray = methods.getListAproximation();
+        System.out.println("A= "+methods.getA());
+        System.out.println("B= "+methods.getB());
         System.out.println("Невязки в точках:");
+        for (int x = 0; x < bufAproxArray.size(); x++) {
+            System.out.println("x="+x+" deltNi="+bufAproxArray.get(x));
+        }
+        System.out.println("Полученные точки:");
         sumSquareDif=0;
-        for (int j = 0; j < bufAproxArray.length; j++) {
-            double value = (Math.abs(listCountException.get(j)-bufAproxArray[j]));
+        for (int j = 0; j < bufAproxArray.size(); j++) {
+            double value = (Math.abs(listCountException.get(j)-bufAproxArray.get(j)));
             System.out.println("Невязка №"+j+"= "+value);
             System.out.println("Квадрат Невязки №"+j+"= "+Math.pow(value,2));
             sumSquareDif += Math.pow(value,2);
@@ -80,7 +82,7 @@ public class Main {
 
         ArrayList<Double> arrayListPN0 = methods.getListPN0( bufArrayDeltNi);
         for (int j = 0; j < arrayListPN0.size(); j++) {
-            System.out.println("P"+j+"= "+ arrayListPN0.get(j));
+            System.out.println("P"+j+"= "+ arrayListPN0.get(j)+ "  dNi"+bufArrayDeltNi[j]);
         }
         System.out.println();
 
